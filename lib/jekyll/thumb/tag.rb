@@ -26,8 +26,7 @@ module Jekyll
       link = options.delete 'link'
       img = %Q{<img #{options.merge(img_attrs).map {|k,v| "#{k}=\"#{v}\""}.join(" ")}>}
       return img if link == false
-      
-      %Q{<a href="#{options['src']}" target="_blank" class="thumb">#{img}</a>}
+      %Q{<a href="#{options['src']}" data-ngthumb="img_01t.jpg"></a>}
     end
 
     def parse_options(markup, context)
