@@ -47,7 +47,6 @@ module Jekyll
         img_attrs["src"] = @src.sub(/(\.\w+)$/, "-#{img_attrs["width"]}w" + '\1')
         img_attrs["src"] = img_attrs["src"].split(".").first + ".jpg"
         img_attrs["background"] = @attrs['background'] || [255,255,255]
-        puts img_attrs
 
         filename = img_attrs["src"].sub(/^\//, '')
         filename = filename.split(".").first + ".jpg"
@@ -56,8 +55,6 @@ module Jekyll
         FileUtils.mkdir_p(File.dirname(dest))
 
         unless File.exist?(dest)
-          puts "Heeeloooooo"
-          puts dest
           thumb = Vips::Image.thumbnail(original_img_path, img_attrs["width"], height: 10000000)
           thumb.jpegsave(dest, optimize_coding: true, strip: true, Q: 90, background: img_attrs["background"])
 
