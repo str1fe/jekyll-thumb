@@ -21,12 +21,13 @@ module Jekyll
       return "Error resizing - can't set both width and height" if options["width"] && options["height"]
 
       site = context.registers[:site]
+      thumb_attrs = generate_image(site, options["src"], options.merge({ "width" => options["thumbwidth"] }))
       img_attrs = generate_image(site, options["src"], options)
 
       link = options.delete 'link'
-      img = %Q{<img #{options.merge(img_attrs).map {|k,v| "#{k}=\"#{v}\""}.join(" ")}>}
+      img = %Q{<img #{options.merge(thumb_attrs).map {|k,v| "#{k}=\"#{v}\""}.join(" ")}>}
       return img if link == false
-      %Q{<a href="#{options['src']}" data-ngthumb="#{img_attrs['src']}"></a>}
+      %Q{<a href="#{img_attrs['src']}" data-ngthumb="#{thumb_attrs['src']}"></a>}
     end
 
     def parse_options(markup, context)
@@ -95,11 +96,12 @@ module Jekyll
       FileUtils.mkdir_p(File.dirname(dest))
 
       unless File.exist?(dest)
-        thumb = Vips::Image.thumbnail original_img_path, img_attrs["width"]
-        thumb.write_to_file(dest, strip: true)
-        if dest.match(/\.png$/) && optimize?(site) && self.class.optipng?
-          `optipng #{dest}`
-        end
+        thumb = Vips::Image.thumbnail(original_img_path, img_attrs["width"], height: 10000000)
+        thumb.jpegsave(dest, optimize_coding: true, strip: true, Q: 90)
+
+        #if dest.match(/\.png$/) && optimize?(site) && self.class.optipng?
+        #  `optipng #{dest}`
+        #end
       end
       site.config['keep_files'] << filename unless site.config['keep_files'].include?(filename)
       # Keep files around for incremental builds in Jekyll 3
